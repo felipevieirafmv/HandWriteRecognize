@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using HandWriteRecognize;
 
 string csv = "./english.csv";
 
@@ -25,3 +26,7 @@ void MoveImage(string origin, string destiny)
         Directory.CreateDirectory(destiny);
     File.Move(origin, destiny + Path.GetFileName(origin));
 }
+
+var form = new Form1();
+
+Application.Run(form);
