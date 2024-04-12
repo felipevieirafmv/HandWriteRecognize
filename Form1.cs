@@ -6,6 +6,9 @@ namespace HandWriteRecognize
 {
     public partial class Form1 : Form
     {
+        PictureBox pb;
+        Bitmap bmp;
+        Graphics g;
         private bool isDrawing = false;
         private Point previousPoint;
 
@@ -18,7 +21,7 @@ namespace HandWriteRecognize
             this.WindowState = FormWindowState.Maximized;
             this.FormBorderStyle = FormBorderStyle.None;
 
-            this.MouseDown += panel1_MouseDown; 
+            this.MouseDown += panel1_MouseDown;
             this.MouseMove += panel1_MouseMove;
             this.MouseUp += panel1_MouseUp;
 
@@ -29,6 +32,23 @@ namespace HandWriteRecognize
                     Application.Exit();
                 }
             };
+
+            this.Load += (o, e) =>
+            {
+                this.bmp = new Bitmap(pb.Width, pb.Height);    
+                g = Graphics.FromImage(bmp);
+                g.Clear(Color.White);
+                this.pb.Image = bmp;
+
+                Onstart();
+                
+            };
+        }
+
+        void Onstart()
+        {
+            Controls controls = new Controls();
+            var trackBar = controls.TrackBar1;
         }
 
         private void panel1_MouseDown(object sender, MouseEventArgs e)
@@ -43,7 +63,10 @@ namespace HandWriteRecognize
             {
                 using (Graphics g = this.CreateGraphics())
                 {
-                    g.DrawLine(Pens.Black, previousPoint, e.Location);
+                    using (Pen pen = new Pen(Color.Black, 5))
+                    {
+                        g.DrawLine(pen, previousPoint, e.Location);
+                    }
                     previousPoint = e.Location;
                 }
             }
