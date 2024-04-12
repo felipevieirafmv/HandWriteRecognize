@@ -27,7 +27,35 @@ def change_thickness(origin):
             cv.imwrite(f"./Img/{origin}/ero{origin}-{i}.png", img)
         i += 1
 
+
+def crop_images(origin):
+    image_dir = f"./Img/{origin}"
+    images = os.listdir(image_dir)
+    x0 = 150
+    y0 = 0
+    x1 = 1050
+    y1 = 900
+    for img_name in images:
+        img_path = os.path.join(image_dir, img_name)
+        img = cv.imread(img_path, cv.COLOR_BGRA2GRAY)
+        cropped_image = img[y0:y1, x0:x1]
+        cv.imwrite(f"./Img/{origin}/{img_name}", cropped_image)
+
+def resize_images(origin):
+    image_dir = f"./Img/{origin}"
+    images = os.listdir(image_dir)
+    width = 128
+    height = 128
+    for img_name in images:
+        img_path = os.path.join(image_dir, img_name)
+        img = cv.imread(img_path, cv.COLOR_BGRA2GRAY)
+        resized_image = cv.resize(img, (width, height), interpolation= cv.INTER_AREA)
+        cv.imwrite(f"./Img/{origin}/{img_name}", resized_image)
+
+
 for j in range(1, 63):
     if(j < 10):
         j = f"0{j}"
     change_thickness(j)
+    crop_images(j)
+    resize_images(j)
