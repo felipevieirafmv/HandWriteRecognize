@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System;
 using Timer = System.Windows.Forms.Timer;
+using System.Diagnostics;
 
 namespace HandWriteRecognize
 {
@@ -11,11 +12,13 @@ namespace HandWriteRecognize
         Bitmap bmp;
         Timer tm;
         Graphics g;
+        string uploadedImagePath = "";
         private bool isDrawing = false;
         private Point previousPoint;
         private int thickness = 5;
         private bool isErasing = false;
-        public Button createButton(string text, Point point, Size size) {
+        public Button createButton(string text, Point point, Size size)
+        {
             Button button = new Button();
             button.Text = text;
             button.Location = point;
@@ -27,13 +30,15 @@ namespace HandWriteRecognize
         {
             InitializeComponent();
 
-            Button button = createButton("Enviar imagem", new Point(0, 50), new Size(100, 30));
-            button.Click += btnSelectImage_Click;
+            Button button = createButton("Fazer upload", new Point(10, 70), new Size(100, 30));
+            button.Click += btnSelectImageClick;
             this.Controls.Add(button);
 
-            Button button2 = createButton("Fechar imagem", new Point(0, 100), new Size(100, 30));
-            button2.Click += btnSelectImage_Click;
+            Button button2 = createButton("Fazer leitura\nda imagem", new Point(10, 100), new Size(100, 40));
+            // button2.Click += ;
             this.Controls.Add(button2);
+
+            this.KeyPreview = true;
 
             this.tm = new Timer();
             this.tm.Interval = 20;
@@ -58,14 +63,21 @@ namespace HandWriteRecognize
                 if (e.KeyCode == Keys.Back)
                     clearPanel();
 
-                if (e.KeyCode == Keys.Up)
-                    this.thickness++;
-
-                if (e.KeyCode == Keys.Down)
-                    this.thickness--;
-
                 if (e.KeyCode == Keys.E)
                     isErasing = !isErasing;
+            };
+
+            this.MouseWheel += (o, e) =>
+            {
+                if (e.Delta > 0)
+                    this.thickness++;
+                else
+                {
+                    if (this.thickness > 1)
+                    {
+                        this.thickness--;
+                    }
+                }
             };
 
             this.Load += (o, e) =>
@@ -99,7 +111,14 @@ namespace HandWriteRecognize
             PointF commandsPoint = new PointF(10, 30);
             g.FillRectangle(Brushes.GhostWhite, commandsPoint.X, commandsPoint.Y, 200, 40);
             g.DrawString(commandsText, commandsFont, commandsBrush, commandsPoint);
-            
+
+            var splitText = uploadedImagePath.Split('\\');
+            string file = splitText[splitText.Length - 1];
+            Font fileFont = new Font("Arial", 12);
+            Brush fileBrush = Brushes.Black;
+            PointF filePoint = new PointF(110, 110);
+            g.FillRectangle(Brushes.GhostWhite, filePoint.X, filePoint.Y, 200, 40);
+            g.DrawString(file, fileFont, fileBrush, filePoint);
         }
 
         private void clearPanel()
@@ -121,7 +140,7 @@ namespace HandWriteRecognize
         {
             if (isDrawing)
             {
-                Brush brush = isErasing? Brushes.White : Brushes.Black; 
+                Brush brush = isErasing ? Brushes.White : Brushes.Black;
                 var deltaX = e.X - previousPoint.X;
                 var deltaY = e.Y - previousPoint.Y;
                 var dist = MathF.Sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -141,7 +160,7 @@ namespace HandWriteRecognize
 
         }
 
-        private void btnSelectImage_Click(object sender, EventArgs e)
+        private void btnSelectImageClick(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
@@ -154,8 +173,7 @@ namespace HandWriteRecognize
             {
                 try
                 {
-                    bmp = new Bitmap(openFileDialog.FileName);
-                    pb.Image = bmp;
+                    uploadedImagePath = openFileDialog.FileName;
                 }
                 catch (Exception ex)
                 {
