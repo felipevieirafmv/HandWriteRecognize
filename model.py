@@ -13,6 +13,8 @@ exists = os.path.exists(model_path)
 model = models.load_model(model_path) \
     if exists \
     else models.Sequential([
+        layers.Resizing(128, 128),
+        layers.Rescaling(1.0/255),
         layers.RandomRotation((-0.1, 0.1)),
         layers.Conv2D(32, (3, 3),
             activation = 'relu',
