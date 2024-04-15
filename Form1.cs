@@ -1,6 +1,7 @@
-using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System;
+using Timer = System.Windows.Forms.Timer;
 
 namespace HandWriteRecognize
 {
@@ -8,6 +9,7 @@ namespace HandWriteRecognize
     {
         PictureBox pb = new PictureBox();
         Bitmap bmp;
+        Timer tm;
         Graphics g;
         private bool isDrawing = false;
         private Point previousPoint;
@@ -17,14 +19,20 @@ namespace HandWriteRecognize
         {
             InitializeComponent();
 
+            this.tm = new Timer();
+            this.tm.Interval = 20;
+
             this.BackColor = Color.White;
 
             this.WindowState = FormWindowState.Maximized;
             this.FormBorderStyle = FormBorderStyle.None;
+            
+            this.Controls.Add(pb);
+            pb.Dock = DockStyle.Fill;
 
-            this.MouseDown += panel1_MouseDown;
-            this.MouseMove += panel1_MouseMove;
-            this.MouseUp += panel1_MouseUp;
+            pb.MouseDown += pb_MouseDown;
+            pb.MouseMove += pb_MouseMove;
+            pb.MouseUp += pb_MouseUp;
 
             this.KeyDown += (o, e) =>
             {
@@ -46,47 +54,57 @@ namespace HandWriteRecognize
                 g = Graphics.FromImage(bmp);
                 g.Clear(Color.White);
                 this.pb.Image = bmp;
-
-                Onstart();
-
             };
+
+            tm.Tick += (o, e) =>
+            {
+                Frame();
+                pb.Refresh();
+            };
+            tm.Start();
         }
 
-        void Onstart()
+        void Frame()
         {
-            string thicknessText = "Hello, WinForms!";
+            string thicknessText = $"{thickness}";
             Font font = new Font("Arial", 12);
             Brush brush = Brushes.Black;
             PointF point = new PointF(10, 10);
+            g.FillRectangle(Brushes.GhostWhite, point.X, point.Y, 30, 20);
             g.DrawString(thicknessText, font, brush, point);
-
         }
 
-        private void panel1_MouseDown(object sender, MouseEventArgs e)
+        private void pb_MouseDown(object sender, MouseEventArgs e)
         {
             isDrawing = true;
             previousPoint = e.Location;
         }
 
-        private void panel1_MouseUp(object sender, MouseEventArgs e)
+        private void pb_MouseUp(object sender, MouseEventArgs e)
         {
             isDrawing = false;
         }
-        private void panel1_MouseMove(object sender, MouseEventArgs e)
+        private void pb_MouseMove(object sender, MouseEventArgs e)
         {
             if (isDrawing)
             {
-                using (Graphics g = this.CreateGraphics())
+                var deltaX = e.X - previousPoint.X;
+                var deltaY = e.Y - previousPoint.Y;
+                var dist = MathF.Sqrt(deltaX * deltaX + deltaY * deltaY);
+                for (float d = 0; d < 1; d += 1f / dist)
                 {
-                    using (Pen pen = new Pen(Color.Black, thickness))
-                    {
-                        g.DrawLine(pen, previousPoint, e.Location);
-                    }
-                    previousPoint = e.Location;
+                    var x = (1 - d) * previousPoint.X + d * e.X;
+                    var y = (1 - d) * previousPoint.Y + d * e.Y;
+                    g.FillEllipse(Brushes.Black, 
+                        x - thickness / 2, 
+                        y - thickness / 2,
+                        thickness, thickness
+                    );
                 }
+                previousPoint = e.Location;
+                pb.Invalidate();
             }
         }
-
-
     }
+
 }
