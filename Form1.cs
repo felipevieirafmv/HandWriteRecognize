@@ -15,10 +15,25 @@ namespace HandWriteRecognize
         private Point previousPoint;
         private int thickness = 5;
         private bool isErasing = false;
+        public Button createButton(string text, Point point, Size size) {
+            Button button = new Button();
+            button.Text = text;
+            button.Location = point;
+            button.Size = size;
+            return button;
+        }
 
         public Form1()
         {
             InitializeComponent();
+
+            Button button = createButton("Enviar imagem", new Point(0, 50), new Size(100, 30));
+            button.Click += btnSelectImage_Click;
+            this.Controls.Add(button);
+
+            Button button2 = createButton("Fechar imagem", new Point(0, 100), new Size(100, 30));
+            button2.Click += btnSelectImage_Click;
+            this.Controls.Add(button2);
 
             this.tm = new Timer();
             this.tm.Interval = 20;
@@ -51,8 +66,6 @@ namespace HandWriteRecognize
 
                 if (e.KeyCode == Keys.E)
                     isErasing = !isErasing;
-                
-
             };
 
             this.Load += (o, e) =>
@@ -126,6 +139,29 @@ namespace HandWriteRecognize
                 pb.Invalidate();
             }
 
+        }
+
+        private void btnSelectImage_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "Arquivos de imagem|*.jpg;*.jpeg;*.png;*.gif;*.bmp|Todos os arquivos|*.*"
+            };
+
+            DialogResult result = openFileDialog.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                try
+                {
+                    bmp = new Bitmap(openFileDialog.FileName);
+                    pb.Image = bmp;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ocorreu um erro ao carregar a imagem: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
     }
 

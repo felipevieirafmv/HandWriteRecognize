@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using HandWriteRecognize;
+using System.Threading;
+using System.Windows.Forms;
 
 // string csv = "./english.csv";
 
@@ -27,6 +29,11 @@ using HandWriteRecognize;
 //     File.Move(origin, destiny + Path.GetFileName(origin));
 // }
 
-var form = new Form1();
+Thread.CurrentThread.SetApartmentState(ApartmentState.Unknown);
+Thread.CurrentThread.SetApartmentState(ApartmentState.STA);
 
+Application.EnableVisualStyles();
+Application.SetCompatibleTextRenderingDefault(false);
+
+var form = new Form1();
 Application.Run(form);
