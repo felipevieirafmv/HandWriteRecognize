@@ -14,6 +14,7 @@ namespace HandWriteRecognize
         private bool isDrawing = false;
         private Point previousPoint;
         private int thickness = 5;
+        private bool isErasing = false;
 
         public Form1()
         {
@@ -26,7 +27,7 @@ namespace HandWriteRecognize
 
             this.WindowState = FormWindowState.Maximized;
             this.FormBorderStyle = FormBorderStyle.None;
-            
+
             this.Controls.Add(pb);
             pb.Dock = DockStyle.Fill;
 
@@ -39,12 +40,18 @@ namespace HandWriteRecognize
                 if (e.KeyCode == Keys.Escape)
                     Application.Exit();
 
+                if (e.KeyCode == Keys.Back)
+                    clearPanel();
+
                 if (e.KeyCode == Keys.Up)
                     this.thickness++;
 
                 if (e.KeyCode == Keys.Down)
                     this.thickness--;
 
+                if (e.KeyCode == Keys.E)
+                    isErasing = !isErasing;
+                
 
             };
 
@@ -67,13 +74,26 @@ namespace HandWriteRecognize
         void Frame()
         {
             string thicknessText = $"{thickness}";
-            Font font = new Font("Arial", 12);
-            Brush brush = Brushes.Black;
-            PointF point = new PointF(10, 10);
-            g.FillRectangle(Brushes.GhostWhite, point.X, point.Y, 30, 20);
-            g.DrawString(thicknessText, font, brush, point);
+            Font thicknessFont = new Font("Arial", 12);
+            Brush thicknessBrush = Brushes.Black;
+            PointF thicknessPoint = new PointF(10, 10);
+            g.FillRectangle(Brushes.GhostWhite, thicknessPoint.X, thicknessPoint.Y, 30, 20);
+            g.DrawString(thicknessText, thicknessFont, thicknessBrush, thicknessPoint);
+
+            string commandsText = "E = Erase\nBackSpace = Clear";
+            Font commandsFont = new Font("Arial", 12);
+            Brush commandsBrush = Brushes.Black;
+            PointF commandsPoint = new PointF(10, 30);
+            g.FillRectangle(Brushes.GhostWhite, commandsPoint.X, commandsPoint.Y, 200, 40);
+            g.DrawString(commandsText, commandsFont, commandsBrush, commandsPoint);
+            
         }
 
+        private void clearPanel()
+        {
+            g.Clear(Color.White);
+            pb.Invalidate();
+        }
         private void pb_MouseDown(object sender, MouseEventArgs e)
         {
             isDrawing = true;
@@ -88,6 +108,7 @@ namespace HandWriteRecognize
         {
             if (isDrawing)
             {
+                Brush brush = isErasing? Brushes.White : Brushes.Black; 
                 var deltaX = e.X - previousPoint.X;
                 var deltaY = e.Y - previousPoint.Y;
                 var dist = MathF.Sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -95,8 +116,8 @@ namespace HandWriteRecognize
                 {
                     var x = (1 - d) * previousPoint.X + d * e.X;
                     var y = (1 - d) * previousPoint.Y + d * e.Y;
-                    g.FillEllipse(Brushes.Black, 
-                        x - thickness / 2, 
+                    g.FillEllipse(brush,
+                        x - thickness / 2,
                         y - thickness / 2,
                         thickness, thickness
                     );
@@ -104,6 +125,7 @@ namespace HandWriteRecognize
                 previousPoint = e.Location;
                 pb.Invalidate();
             }
+
         }
     }
 
