@@ -77,7 +77,7 @@ namespace HandWriteRecognize
             Font thicknessFont = new Font("Arial", 12);
             Brush thicknessBrush = Brushes.Black;
             PointF thicknessPoint = new PointF(10, 10);
-            g.FillRectangle(Brushes.GhostWhite, thicknessPoint.X, thicknessPoint.Y, 30, 20);
+            g.FillRectangle(Brushes.GhostWhite, thicknessPoint.X, thicknessPoint.Y, 200, 20);
             g.DrawString(thicknessText, thicknessFont, thicknessBrush, thicknessPoint);
 
             string commandsText = "E = Erase\nBackSpace = Clear";
@@ -86,11 +86,18 @@ namespace HandWriteRecognize
             PointF commandsPoint = new PointF(10, 30);
             g.FillRectangle(Brushes.GhostWhite, commandsPoint.X, commandsPoint.Y, 200, 40);
             g.DrawString(commandsText, commandsFont, commandsBrush, commandsPoint);
-            
+
+            if (this.isErasing)
+            {
+                this.Cursor = new Cursor("./aero_unavail.cur");
+                return;
+            }
+            this.Cursor = new Cursor("./aero_pen.cur");
         }
 
         private void clearPanel()
         {
+            this.thickness = 5;
             g.Clear(Color.White);
             pb.Invalidate();
         }
