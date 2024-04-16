@@ -1,7 +1,7 @@
 import os
 import cv2 as cv
 import numpy as np
-from utils import find, resize2
+from python.utils import find, resize2
 from tensorflow.keras import models, layers, activations, \
     optimizers, utils, losses, initializers, metrics, callbacks
 
