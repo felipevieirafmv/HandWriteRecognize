@@ -3,7 +3,6 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 import random
-from HandWriteRecognize.python.cropfloodfill import crop_images
 
 def show(img):
     plt.imshow(img, cmap='gray')
