@@ -8,16 +8,21 @@ namespace HandWriteRecognize
 {
     public partial class Form1 : Form
     {
-        PictureBox pb = new PictureBox();
+        PictureBox pb = new PictureBox {
+            Dock = DockStyle.Fill
+        };
         PictureBox imagepb = new PictureBox();
         Bitmap bmp;
         Timer tm;
         Graphics g;
         string uploadedImagePath = "";
         private bool isDrawing = false;
-        private Point previousPoint;
-        private int thickness = 5;
         private bool isErasing = false;
+        private int thickness = 5;
+        private Point previousPoint;
+        private Point canvaSPoint = new Point(500, 0); // Canva Start Point
+        private Size canvaSize;
+
         public Button createButton(string text, Point point, Size size)
         {
             Button button = new Button();
@@ -58,11 +63,11 @@ namespace HandWriteRecognize
             this.FormBorderStyle = FormBorderStyle.None;
 
             this.Controls.Add(pb);
-            pb.Dock = DockStyle.Fill;
-
             pb.MouseDown += pb_MouseDown;
             pb.MouseMove += pb_MouseMove;
             pb.MouseUp += pb_MouseUp;
+
+            canvaSize = new Size(pb.Width - canvaSPoint.X, pb.Height - canvaSPoint.Y);
 
             this.KeyDown += (o, e) =>
             {
@@ -102,6 +107,7 @@ namespace HandWriteRecognize
                 Frame();
                 pb.Refresh();
             };
+
             tm.Start();
         }
 
@@ -109,10 +115,10 @@ namespace HandWriteRecognize
         {
             Font font = new Font("Arial", 12);
             Brush brush = Brushes.Black;
-            Pen pen = new Pen(brush, 5);
+            Pen pen = new Pen(brush);
 
-            g.FillRectangle(Brushes.GhostWhite, 0, 0, 200, pb.Height);
-            g.DrawLine(pen, 195, 0, 195, this.Height);
+            g.FillRectangle(Brushes.LightGray, 0, 0, canvaSPoint.X, this.Height);
+            g.DrawLine(pen, canvaSPoint.X - 1, canvaSPoint.Y, canvaSPoint.X - 1, this.Height);
 
             string thicknessText = $"{thickness}";
             g.DrawString(thicknessText, font, brush, new PointF(10, 10));
@@ -173,7 +179,7 @@ namespace HandWriteRecognize
 
         private void printScreen(object sender, EventArgs e)
         {
-            Bitmap croppedBitmap = bmp.Clone(new Rectangle(200, 0, pb.Width - 200, pb.Height), bmp.PixelFormat);
+            Bitmap croppedBitmap = bmp.Clone(new Rectangle(canvaSPoint.X, canvaSPoint.Y, pb.Width - canvaSPoint.X, pb.Height - canvaSPoint.Y), bmp.PixelFormat);
             string filePath = "screenshot.png";
             croppedBitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
             MessageBox.Show("Captura de tela salva com sucesso em: " + filePath, "Sucesso");
@@ -192,8 +198,8 @@ namespace HandWriteRecognize
                 try
                 {
                     uploadedImagePath = openFileDialog.FileName;
-                    imagepb.Location = new Point(195, 0);
-                    imagepb.Size = new Size(pb.Width - 200, pb.Height);
+                    imagepb.Location = new Point(canvaSPoint.X, canvaSPoint.Y);
+                    imagepb.Size = canvaSize;
                     imagepb.Image = new Bitmap(uploadedImagePath);
                     pb.Controls.Add(imagepb);
                 }
