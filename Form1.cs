@@ -9,6 +9,7 @@ namespace HandWriteRecognize
     public partial class Form1 : Form
     {
         PictureBox pb = new PictureBox();
+        PictureBox imagepb = new PictureBox();
         Bitmap bmp;
         Timer tm;
         Graphics g;
@@ -31,16 +32,20 @@ namespace HandWriteRecognize
             InitializeComponent();
 
             Button button = createButton("Fazer upload", new Point(10, 70), new Size(100, 30));
-            button.Click += selectImage;
+            button.Click += uploadImage;
             this.Controls.Add(button);
 
-            Button button2 = createButton("Fazer leitura\nda imagem", new Point(10, 100), new Size(100, 40));
-            // button2.Click += ;
+            Button button2 = createButton("Fechar imagem", new Point(10, 100), new Size(100, 30));
+            button2.Click += closeImage;
             this.Controls.Add(button2);
 
-            Button button3 = createButton("Tirar print", new Point(10, 140), new Size(100, 30));
-            button3.Click += printScreen;
+            Button button3 = createButton("Fazer leitura\nda imagem", new Point(10, 130), new Size(100, 40));
+            // button3.Click += ;
             this.Controls.Add(button3);
+
+            Button button4 = createButton("Tirar print", new Point(10, 170), new Size(100, 30));
+            button4.Click += printScreen;
+            this.Controls.Add(button4);
 
             this.KeyPreview = true;
 
@@ -110,23 +115,23 @@ namespace HandWriteRecognize
             g.DrawLine(pen, 195, 0, 195, this.Height);
 
             string thicknessText = $"{thickness}";
-            PointF thicknessPoint = new PointF(10, 10);
-            g.DrawString(thicknessText, font, brush, thicknessPoint);
+            g.DrawString(thicknessText, font, brush, new PointF(10, 10));
 
             string commandsText = "E = Erase\nBackSpace = Clear";
-            PointF commandsPoint = new PointF(10, 30);
-            g.DrawString(commandsText, font, brush, commandsPoint);
+            g.DrawString(commandsText, font, brush, new PointF(10, 30));
+
+            var splitText = uploadedImagePath.Split('\\');
+            string file = splitText[splitText.Length - 1];
+            if (file.Length > 10)
+                file = file.Substring(0, 7) + "...";
+            g.DrawString(file, font, brush, new PointF(110, 75));
 
             if (this.isErasing)
             {
-                this.Cursor = new Cursor("./aero_unavail.cur");
+                this.Cursor = new Cursor("./cursors/aero_unavail.cur");
                 return;
             }
-            this.Cursor = new Cursor("./aero_pen.cur");
-            var splitText = uploadedImagePath.Split('\\');
-            string file = splitText[splitText.Length - 1];
-            PointF filePoint = new PointF(110, 110);
-            g.DrawString(file, font, brush, filePoint);
+            this.Cursor = new Cursor("./cursors/aero_pen.cur");
         }
 
         private void clearPanel()
@@ -140,11 +145,8 @@ namespace HandWriteRecognize
             isDrawing = true;
             previousPoint = e.Location;
         }
-
         private void pb_MouseUp(object sender, MouseEventArgs e)
-        {
-            isDrawing = false;
-        }
+            => isDrawing = false;
         private void pb_MouseMove(object sender, MouseEventArgs e)
         {
             if (isDrawing)
@@ -176,8 +178,7 @@ namespace HandWriteRecognize
             croppedBitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
             MessageBox.Show("Captura de tela salva com sucesso em: " + filePath, "Sucesso");
         }
-
-        private void selectImage(object sender, EventArgs e)
+        private void uploadImage(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
@@ -191,6 +192,10 @@ namespace HandWriteRecognize
                 try
                 {
                     uploadedImagePath = openFileDialog.FileName;
+                    imagepb.Location = new Point(195, 0);
+                    imagepb.Size = new Size(pb.Width - 200, pb.Height);
+                    imagepb.Image = new Bitmap(uploadedImagePath);
+                    pb.Controls.Add(imagepb);
                 }
                 catch (Exception ex)
                 {
@@ -198,6 +203,8 @@ namespace HandWriteRecognize
                 }
             }
         }
+        private void closeImage(object sender, EventArgs e)
+            => pb.Controls.Remove(imagepb);
     }
 
 }
