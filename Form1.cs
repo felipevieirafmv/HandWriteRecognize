@@ -31,12 +31,16 @@ namespace HandWriteRecognize
             InitializeComponent();
 
             Button button = createButton("Fazer upload", new Point(10, 70), new Size(100, 30));
-            button.Click += btnSelectImageClick;
+            button.Click += selectImage;
             this.Controls.Add(button);
 
             Button button2 = createButton("Fazer leitura\nda imagem", new Point(10, 100), new Size(100, 40));
             // button2.Click += ;
             this.Controls.Add(button2);
+
+            Button button3 = createButton("Tirar print", new Point(10, 140), new Size(100, 30));
+            button3.Click += printScreen;
+            this.Controls.Add(button3);
 
             this.KeyPreview = true;
 
@@ -98,19 +102,20 @@ namespace HandWriteRecognize
 
         void Frame()
         {
+            Font font = new Font("Arial", 12);
+            Brush brush = Brushes.Black;
+            Pen pen = new Pen(brush, 5);
+
+            g.FillRectangle(Brushes.GhostWhite, 0, 0, 200, pb.Height);
+            g.DrawLine(pen, 195, 0, 195, this.Height);
+
             string thicknessText = $"{thickness}";
-            Font thicknessFont = new Font("Arial", 12);
-            Brush thicknessBrush = Brushes.Black;
             PointF thicknessPoint = new PointF(10, 10);
-            g.FillRectangle(Brushes.GhostWhite, thicknessPoint.X, thicknessPoint.Y, 200, 20);
-            g.DrawString(thicknessText, thicknessFont, thicknessBrush, thicknessPoint);
+            g.DrawString(thicknessText, font, brush, thicknessPoint);
 
             string commandsText = "E = Erase\nBackSpace = Clear";
-            Font commandsFont = new Font("Arial", 12);
-            Brush commandsBrush = Brushes.Black;
             PointF commandsPoint = new PointF(10, 30);
-            g.FillRectangle(Brushes.GhostWhite, commandsPoint.X, commandsPoint.Y, 200, 40);
-            g.DrawString(commandsText, commandsFont, commandsBrush, commandsPoint);
+            g.DrawString(commandsText, font, brush, commandsPoint);
 
             if (this.isErasing)
             {
@@ -120,11 +125,8 @@ namespace HandWriteRecognize
             this.Cursor = new Cursor("./aero_pen.cur");
             var splitText = uploadedImagePath.Split('\\');
             string file = splitText[splitText.Length - 1];
-            Font fileFont = new Font("Arial", 12);
-            Brush fileBrush = Brushes.Black;
             PointF filePoint = new PointF(110, 110);
-            g.FillRectangle(Brushes.GhostWhite, filePoint.X, filePoint.Y, 200, 40);
-            g.DrawString(file, fileFont, fileBrush, filePoint);
+            g.DrawString(file, font, brush, filePoint);
         }
 
         private void clearPanel()
@@ -167,7 +169,15 @@ namespace HandWriteRecognize
 
         }
 
-        private void btnSelectImageClick(object sender, EventArgs e)
+        private void printScreen(object sender, EventArgs e)
+        {
+            Bitmap croppedBitmap = bmp.Clone(new Rectangle(200, 0, pb.Width - 200, pb.Height), bmp.PixelFormat);
+            string filePath = "screenshot.png";
+            croppedBitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
+            MessageBox.Show("Captura de tela salva com sucesso em: " + filePath, "Sucesso");
+        }
+
+        private void selectImage(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
