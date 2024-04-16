@@ -18,6 +18,7 @@ namespace HandWriteRecognize
         private Point previousPoint;
         private int thickness = 5;
         private bool isErasing = false;
+        TextBox textBox;
         public Button createButton(string text, Point point, Size size)
         {
             Button button = new Button();
@@ -30,6 +31,12 @@ namespace HandWriteRecognize
         public Form1()
         {
             InitializeComponent();
+
+            textBox = new TextBox();
+            textBox.Location = new Point(10, 210); // Posição do TextBox
+            textBox.Size = new Size(150, 20); // Tamanho do TextBox
+            textBox.TextChanged += textForResult; // Evento para detectar alterações no texto
+            this.Controls.Add(textBox);
 
             Button button = createButton("Fazer upload", new Point(10, 70), new Size(100, 30));
             button.Click += uploadImage;
@@ -134,6 +141,16 @@ namespace HandWriteRecognize
             this.Cursor = new Cursor("./cursors/aero_pen.cur");
         }
 
+        private void textForResult(object sender, EventArgs e)
+        {
+            //Mudar depois para receber o predict
+            string text = textBox.Text;
+
+            Font font = new Font("Arial", 24);
+            Brush brush = Brushes.Black;
+            g.DrawString(text, font, brush, new PointF(pb.Width / 2, this.Height - 100));
+
+        }
         private void clearPanel()
         {
             this.thickness = 5;
