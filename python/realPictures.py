@@ -56,5 +56,9 @@ for rect in rects:
     results.append(model.predict(pred_img))
     # mark = cv.rectangle(mark, rect[0], rect[1], (0, 0, 255), 2)
 
+str = ''
+
 for result in results:
-    print(valor_para_caractere(np.argmax(result) + 1))
+    str = str + valor_para_caractere(np.argmax(result) + 1)
+
+print(str)
