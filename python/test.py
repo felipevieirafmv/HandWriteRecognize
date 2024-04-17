@@ -29,9 +29,6 @@ def transform_image():
                 r = 255
             row[l] = (b, g, r)
 
-    cv.imshow('image', img)
-    cv.waitKey(0)
-
     for j in range(len(img)):
         row = img[j]
         for i in range(len(row)):
@@ -47,8 +44,5 @@ def transform_image():
     img = cv.erode(img, np.ones((10, 10)))
     img = cv.dilate(img, np.ones((7, 7)))
     # ret3,img2 = cv.threshold(blur,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
-
-    cv.imshow('image', img)
-    cv.waitKey(0)
 
     cv.imwrite("uploaded.png", img)

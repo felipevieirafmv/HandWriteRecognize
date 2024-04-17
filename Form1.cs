@@ -251,7 +251,7 @@ namespace HandWriteRecognize
         private void runPython(object sender, EventArgs e)
         {
             string pythonInterpreter = "C:/Program Files/Python311/python.exe";
-            string pythonScript = "C:/Users/disrct/Desktop/ProjectVC/HandWriteRecognize/python/realPictures.py";
+            string pythonScript = "C:/Users/disrct/Desktop/HandWriteRecognize/python/realPictures.py";
 
             ProcessStartInfo startInfo = new ProcessStartInfo
             {

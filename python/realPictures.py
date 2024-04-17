@@ -2,12 +2,14 @@ import os
 import cv2 as cv
 import numpy as np
 from utils import find, resize2
+from test import transform_image
 from tensorflow.keras import models, layers, activations, \
     optimizers, utils, losses, initializers, metrics, callbacks
 
 org = cv.imread('screen.png')
 
 if os.path.exists('uploaded.png'):
+    transform_image()
     org = cv.imread('uploaded.png')
 
 img = org.copy()
