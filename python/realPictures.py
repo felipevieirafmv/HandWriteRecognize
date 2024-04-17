@@ -5,7 +5,10 @@ from utils import find, resize2
 from tensorflow.keras import models, layers, activations, \
     optimizers, utils, losses, initializers, metrics, callbacks
 
-org = cv.imread('screenshot.png')
+org = cv.imread('screen.png')
+
+if os.path.exists('uploaded.png'):
+    org = cv.imread('uploaded.png')
 
 img = org.copy()
 img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)

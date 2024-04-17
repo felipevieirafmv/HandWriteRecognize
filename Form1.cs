@@ -3,22 +3,25 @@ using System.Windows.Forms;
 using System;
 using Timer = System.Windows.Forms.Timer;
 using System.Diagnostics;
+using System.IO;
 
 namespace HandWriteRecognize
 {
     public partial class Form1 : Form
     {
-        PictureBox pb = new PictureBox {
+        PictureBox pb = new PictureBox
+        {
             Dock = DockStyle.Fill
         };
         PictureBox imagepb = new PictureBox();
         Bitmap bmp;
         Timer tm;
+        Timer savetm;
         Graphics g;
         string uploadedImagePath = "";
         private bool isDrawing = false;
         private bool isErasing = false;
-        TextBox textBox;
+        string outputText = "Output:";
         private int thickness = 5;
         private Point previousPoint;
         private Point canvaSPoint = new Point(200, 0); // Canva Start Point
@@ -37,14 +40,16 @@ namespace HandWriteRecognize
             return button;
         }
 
+        public void saveBitmap(Bitmap bmp, string path)
+        {
+            Bitmap croppedBitmap = bmp.Clone(new Rectangle(canvaSPoint.X, canvaSPoint.Y, canvaSize.Width, canvaSize.Height), bmp.PixelFormat);
+            string filePath = path;
+            croppedBitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
+        }
+
         public Form1()
         {
             InitializeComponent();
-
-            textBox = new TextBox();
-            textBox.Location = new Point(10, 210);
-            textBox.Size = new Size(150, 20);
-            this.Controls.Add(textBox);
 
             Button button = createButton("Fazer upload", new Point(10, 70), new Size(100, 30));
             button.Click += uploadImage;
@@ -55,7 +60,7 @@ namespace HandWriteRecognize
             this.Controls.Add(button2);
 
             Button button3 = createButton("Fazer leitura\nda imagem", new Point(10, 130), new Size(100, 40));
-            // button3.Click += ;
+            button3.Click += runPython;
             this.Controls.Add(button3);
 
             Button button4 = createButton("Tirar print", new Point(10, 170), new Size(100, 30));
@@ -67,6 +72,9 @@ namespace HandWriteRecognize
             this.tm = new Timer();
             this.tm.Interval = 20;
 
+            this.savetm = new Timer();
+            this.savetm.Interval = 1000;
+
             this.BackColor = Color.White;
 
             this.WindowState = FormWindowState.Maximized;
@@ -77,7 +85,7 @@ namespace HandWriteRecognize
             pb.MouseDown += pb_MouseDown;
             pb.MouseMove += pb_MouseMove;
             pb.MouseUp += pb_MouseUp;
-        
+
             canvaSize = new Size(canvaFPoint.X - canvaSPoint.X, canvaFPoint.Y - canvaSPoint.Y);
 
             this.KeyDown += (o, e) =>
@@ -119,7 +127,13 @@ namespace HandWriteRecognize
                 pb.Refresh();
             };
 
+            savetm.Tick += (o, e) =>
+            {
+                saveBitmap(bmp, "screen.png");
+            };
+
             tm.Start();
+            savetm.Start();
         }
 
         void Frame()
@@ -132,8 +146,6 @@ namespace HandWriteRecognize
             g.DrawLine(pen, canvaSPoint.X - 1, canvaSPoint.Y, canvaSPoint.X - 1, canvaFPoint.Y);
             g.FillRectangle(Brushes.LightGray, 0, canvaFPoint.Y, pb.Width, pb.Height);
             g.DrawLine(pen, canvaSPoint.X, canvaFPoint.Y + 1, canvaFPoint.X, canvaFPoint.Y + 1);
-            
-            g.DrawString(textBox.Text, font, brush, new PointF(canvaSPoint.X, canvaFPoint.Y + 10));
 
             string thicknessText = $"{thickness}";
             g.DrawString(thicknessText, font, brush, new PointF(10, 10));
@@ -143,9 +155,13 @@ namespace HandWriteRecognize
 
             var splitText = uploadedImagePath.Split('\\');
             string file = splitText[splitText.Length - 1];
-            if (file.Length > 10)
-                file = file.Substring(0, 7) + "...";
+            int text_length = (int)canvaSPoint.X / 20;
+            if (file.Length > text_length)
+                file = file.Substring(0, text_length - 3) + "...";
+            
             g.DrawString(file, font, brush, new PointF(110, 75));
+
+            g.DrawString(outputText, new Font("Arial", 24), brush, new PointF(canvaSPoint.X, canvaFPoint.Y + 10));
 
             if (this.isErasing)
             {
@@ -189,15 +205,11 @@ namespace HandWriteRecognize
                 previousPoint = e.Location;
                 pb.Invalidate();
             }
-
         }
 
         private void printScreen(object sender, EventArgs e)
         {
-            Bitmap croppedBitmap = bmp.Clone(new Rectangle(canvaSPoint.X, canvaSPoint.Y, canvaSize.Width, canvaSize.Height), bmp.PixelFormat);
-            string filePath = "screenshot.png";
-            croppedBitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
-            MessageBox.Show("Captura de tela salva com sucesso em: " + filePath, "Sucesso");
+            saveBitmap(bmp, "screenshot.png");
         }
         private void uploadImage(object sender, EventArgs e)
         {
@@ -213,9 +225,14 @@ namespace HandWriteRecognize
                 try
                 {
                     uploadedImagePath = openFileDialog.FileName;
+
+                    Bitmap image = new Bitmap(uploadedImagePath);
+                    image.Save("uploaded.png", System.Drawing.Imaging.ImageFormat.Png);
+
                     imagepb.Location = new Point(canvaSPoint.X, canvaSPoint.Y);
                     imagepb.Size = canvaSize;
-                    imagepb.Image = new Bitmap(uploadedImagePath);
+                    imagepb.Image = image;
+
                     pb.Controls.Add(imagepb);
                 }
                 catch (Exception ex)
@@ -225,7 +242,45 @@ namespace HandWriteRecognize
             }
         }
         private void closeImage(object sender, EventArgs e)
-            => pb.Controls.Remove(imagepb);
+        {
+            pb.Controls.Remove(imagepb);
+            uploadedImagePath = "";
+            File.Delete("uploaded.png");
+        }
+
+        private void runPython(object sender, EventArgs e)
+        {
+            string pythonInterpreter = "C:/Program Files/Python311/python.exe";
+            string pythonScript = "C:/Users/disrct/Desktop/ProjectVC/HandWriteRecognize/python/realPictures.py";
+
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = pythonInterpreter,
+                Arguments = pythonScript,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (Process process = Process.Start(startInfo))
+            {
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+
+                if (process.ExitCode != 0)
+                {
+                    MessageBox.Show("Erro ao executar o script Python:");
+                    MessageBox.Show(error);
+                }
+                else
+                {
+                    string[] output_lines = output.Split('\n');
+                    outputText = "Output: " + output_lines[output_lines.Length - 2];
+                }
+            }
+        }
     }
 
 }
