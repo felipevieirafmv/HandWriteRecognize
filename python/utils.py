@@ -140,7 +140,7 @@ def resize2(img, size):
     
     new_img = np.ones((nheigth, nwidth, 3), dtype=np.uint8) * 255
     
-    scale = min(nheigth/heigth, nwidth/width)
+    scale = min(nheigth / heigth / 2, nwidth / width / 2)
 
     swidth = int(width * scale)
     sheight = int(heigth * scale)

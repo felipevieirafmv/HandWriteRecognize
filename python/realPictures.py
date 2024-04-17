@@ -27,7 +27,7 @@ def valor_para_caractere(valor):
 def get_x0(square):
     return square[0][0]
 
-model = models.load_model("checkpoints/crop-91-85.keras")
+model = models.load_model("checkpoints/87-83.keras")
 
 rects = []
 for i in range(len(img)):
@@ -44,6 +44,8 @@ mark = org.copy()
 for rect in rects:
     pred_img = mark[rect[0][1] : rect[1][1], rect[0][0] : rect[1][0]]
     pred_img = resize2(pred_img, 128)
+    cv.imshow('image', pred_img)
+    cv.waitKey(0)
     pred_img = pred_img.reshape((1, 128, 128, 3))
     results.append(model.predict(pred_img))
 
