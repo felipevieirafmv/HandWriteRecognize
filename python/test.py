@@ -45,4 +45,4 @@ def transform_image():
     img = cv.dilate(img, np.ones((7, 7)))
     # ret3,img2 = cv.threshold(blur,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
 
-    cv.imwrite("uploaded.png", img)
+    cv.imwrite("filtered.png", img)

@@ -4,6 +4,7 @@ using System;
 using Timer = System.Windows.Forms.Timer;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 
 namespace HandWriteRecognize
 {
@@ -59,13 +60,9 @@ namespace HandWriteRecognize
             button2.Click += closeImage;
             this.Controls.Add(button2);
 
-            Button button3 = createButton("Fazer leitura\nda imagem", new Point(10, 130), new Size(100, 40));
-            button3.Click += runPython;
+            Button button3 = createButton("Tirar print", new Point(10, 130), new Size(100, 30));
+            button3.Click += printScreen;
             this.Controls.Add(button3);
-
-            Button button4 = createButton("Tirar print", new Point(10, 170), new Size(100, 30));
-            button4.Click += printScreen;
-            this.Controls.Add(button4);
 
             this.KeyPreview = true;
 
@@ -73,7 +70,7 @@ namespace HandWriteRecognize
             this.tm.Interval = 20;
 
             this.savetm = new Timer();
-            this.savetm.Interval = 1000;
+            this.savetm.Interval = 4000;
 
             this.BackColor = Color.White;
 
@@ -130,6 +127,7 @@ namespace HandWriteRecognize
             savetm.Tick += (o, e) =>
             {
                 saveBitmap(bmp, "screen.png");
+                runPython();
             };
 
             tm.Start();
@@ -173,7 +171,6 @@ namespace HandWriteRecognize
 
         private void clearPanel()
         {
-            this.thickness = 5;
             g.Clear(Color.White);
             pb.Invalidate();
         }
@@ -229,6 +226,7 @@ namespace HandWriteRecognize
                     Bitmap image = new Bitmap(uploadedImagePath);
                     image.Save("uploaded.png", System.Drawing.Imaging.ImageFormat.Png);
 
+                    image = new Bitmap(image, canvaSize.Width, canvaSize.Height);
                     imagepb.Location = new Point(canvaSPoint.X, canvaSPoint.Y);
                     imagepb.Size = canvaSize;
                     imagepb.Image = image;
@@ -248,37 +246,14 @@ namespace HandWriteRecognize
             File.Delete("uploaded.png");
         }
 
-        private void runPython(object sender, EventArgs e)
+        async private void runPython()
         {
-            string pythonInterpreter = "C:/Program Files/Python311/python.exe";
-            string pythonScript = "C:/Users/disrct/Desktop/HandWriteRecognize/python/realPictures.py";
-
-            ProcessStartInfo startInfo = new ProcessStartInfo
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = await client.GetAsync("http://127.0.0.1:8000/");
+            
+            if (response.IsSuccessStatusCode)
             {
-                FileName = pythonInterpreter,
-                Arguments = pythonScript,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            using (Process process = Process.Start(startInfo))
-            {
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-                process.WaitForExit();
-
-                if (process.ExitCode != 0)
-                {
-                    MessageBox.Show("Erro ao executar o script Python:");
-                    MessageBox.Show(error);
-                }
-                else
-                {
-                    string[] output_lines = output.Split('\n');
-                    outputText = "Output: " + output_lines[output_lines.Length - 2];
-                }
+                outputText = "Output: " + await response.Content.ReadAsStringAsync();
             }
         }
     }
