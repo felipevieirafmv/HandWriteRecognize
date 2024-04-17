@@ -1,11 +1,11 @@
 import os
 import cv2 as cv
 import numpy as np
-from python.utils import find, resize2
+from utils import find, resize2
 from tensorflow.keras import models, layers, activations, \
     optimizers, utils, losses, initializers, metrics, callbacks
 
-org = cv.imread('imgTest/a2.png')
+org = cv.imread('screenshot.png')
 
 # width = 300
 # height = 400
@@ -50,8 +50,8 @@ for rect in rects:
     print(f"X0: {rect[0][0]}, X1: {rect[1][0]}")
     pred_img = mark[rect[0][1] : rect[1][1], rect[0][0] : rect[1][0]]
     pred_img = resize2(pred_img, 128)
-    cv.imshow('image', pred_img)
-    cv.waitKey(0)
+    # cv.imshow('image', pred_img)
+    # cv.waitKey(0)
     pred_img = pred_img.reshape((1, 128, 128, 3))
     results.append(model.predict(pred_img))
     # mark = cv.rectangle(mark, rect[0], rect[1], (0, 0, 255), 2)
