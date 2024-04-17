@@ -7,6 +7,9 @@ from tensorflow.keras import models, layers, activations, \
 
 org = cv.imread('screen.png')
 
+if os.path.exists('uploaded.png'):
+    org = cv.imread('uploaded.png')
+
 # width = 300
 # height = 400
 # org = cv.resize(org, (width, height))
