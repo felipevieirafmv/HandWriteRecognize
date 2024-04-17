@@ -131,7 +131,7 @@ namespace HandWriteRecognize
             g.FillRectangle(Brushes.LightGray, 0, 0, canvaSPoint.X, pb.Height);
             g.DrawLine(pen, canvaSPoint.X - 1, canvaSPoint.Y, canvaSPoint.X - 1, canvaFPoint.Y);
             g.FillRectangle(Brushes.LightGray, 0, canvaFPoint.Y, pb.Width, pb.Height);
-            g.DrawLine(pen, canvaSPoint.X, canvaFPoint.Y - 1, canvaFPoint.X, canvaFPoint.Y - 1);
+            g.DrawLine(pen, canvaSPoint.X, canvaFPoint.Y + 1, canvaFPoint.X, canvaFPoint.Y + 1);
             
             g.DrawString(textBox.Text, font, brush, new PointF(canvaSPoint.X, canvaFPoint.Y + 10));
 

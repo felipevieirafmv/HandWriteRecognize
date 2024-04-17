@@ -46,8 +46,8 @@ results = []
 
 mark = org.copy()
 for rect in rects:
-    print(f"Y0: {rect[0][1]}, Y1: {rect[1][1]}")
-    print(f"X0: {rect[0][0]}, X1: {rect[1][0]}")
+    # print(f"Y0: {rect[0][1]}, Y1: {rect[1][1]}")
+    # print(f"X0: {rect[0][0]}, X1: {rect[1][0]}")
     pred_img = mark[rect[0][1] : rect[1][1], rect[0][0] : rect[1][0]]
     pred_img = resize2(pred_img, 128)
     # cv.imshow('image', pred_img)
@@ -56,9 +56,9 @@ for rect in rects:
     results.append(model.predict(pred_img))
     # mark = cv.rectangle(mark, rect[0], rect[1], (0, 0, 255), 2)
 
-str = ''
+str2 = ''
 
 for result in results:
-    str = str + valor_para_caractere(np.argmax(result) + 1)
+    str2 = str2 + valor_para_caractere(np.argmax(result) + 1)
 
-print(str)
+print(str2)
