@@ -5,7 +5,7 @@ from utils import find, resize2
 from tensorflow.keras import models, layers, activations, \
     optimizers, utils, losses, initializers, metrics, callbacks
 
-org = cv.imread('screenshot.png')
+org = cv.imread('screen.png')
 
 # width = 300
 # height = 400
