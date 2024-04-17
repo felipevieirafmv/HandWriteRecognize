@@ -226,6 +226,7 @@ namespace HandWriteRecognize
                     Bitmap image = new Bitmap(uploadedImagePath);
                     image.Save("uploaded.png", System.Drawing.Imaging.ImageFormat.Png);
 
+                    image = new Bitmap(image, canvaSize.Width, canvaSize.Height);
                     imagepb.Location = new Point(canvaSPoint.X, canvaSPoint.Y);
                     imagepb.Size = canvaSize;
                     imagepb.Image = image;

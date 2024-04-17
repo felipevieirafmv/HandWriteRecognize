@@ -11,7 +11,7 @@ def prediction():
 
     if os.path.exists('uploaded.png'):
         transform_image()
-        org = cv.imread('uploaded.png')
+        org = cv.imread('filtered.png')
 
     img = org.copy()
     img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
