@@ -7,15 +7,8 @@ from tensorflow.keras import models, layers, activations, \
 
 org = cv.imread('screenshot.png')
 
-# width = 300
-# height = 400
-# org = cv.resize(org, (width, height))
-
 img = org.copy()
 img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-
-# blur = cv.GaussianBlur(img,(5,5),0)
-# ret3,img = cv.threshold(blur,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
 
 def valor_para_caractere(valor):
     if valor >= 1 and valor <= 10:
@@ -46,15 +39,10 @@ results = []
 
 mark = org.copy()
 for rect in rects:
-    # print(f"Y0: {rect[0][1]}, Y1: {rect[1][1]}")
-    # print(f"X0: {rect[0][0]}, X1: {rect[1][0]}")
     pred_img = mark[rect[0][1] : rect[1][1], rect[0][0] : rect[1][0]]
     pred_img = resize2(pred_img, 128)
-    # cv.imshow('image', pred_img)
-    # cv.waitKey(0)
     pred_img = pred_img.reshape((1, 128, 128, 3))
     results.append(model.predict(pred_img))
-    # mark = cv.rectangle(mark, rect[0], rect[1], (0, 0, 255), 2)
 
 str2 = ''
 
