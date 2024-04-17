@@ -30,7 +30,7 @@ def prediction():
     def get_x0(square):
         return square[0][0]
 
-    model = models.load_model("checkpoints/crop-91-85.keras")
+    model = models.load_model("checkpoints/87-83.keras")
 
     rects = []
     for i in range(len(img)):
