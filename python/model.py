@@ -31,8 +31,8 @@ model = models.load_model(model_path) \
             kernel_initializer = initializers.RandomNormal()
         ),
         layers.MaxPooling2D((2, 2)),
-        layers.Dropout(0.5),
         layers.Flatten(),
+        layers.Dropout(0.5),
         layers.Dense(64,
             activation = 'relu',
             kernel_initializer = initializers.RandomNormal()
