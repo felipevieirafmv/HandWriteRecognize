@@ -7,7 +7,7 @@ batch_size = 32
 patience = 20
 learning_rate = 0.001
 destiny_path = "Img"
-model_path = f"checkpoints/{destiny_path}.keras"
+model_path = f"checkpoints/model.keras"
 exists = os.path.exists(model_path)
 
 model = models.load_model(model_path) \
