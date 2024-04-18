@@ -19,10 +19,11 @@ namespace HandWriteRecognize
         Timer tm;
         Timer savetm;
         Graphics g;
-        string uploadedImagePath = "";
+        private string uploadedImagePath = "";
         private bool isDrawing = false;
         private bool isErasing = false;
         string outputText = "Output:";
+        private int timeInterval = 500;
         private int thickness = 25;
         private Point previousPoint;
         private Point canvaSPoint = new Point(200, 0); // Canva Start Point
@@ -71,7 +72,7 @@ namespace HandWriteRecognize
             this.tm.Interval = 20;
 
             this.savetm = new Timer();
-            this.savetm.Interval = 200;
+            this.savetm.Interval = saveInterval;
 
             this.BackColor = Color.White;
 
@@ -251,7 +252,7 @@ namespace HandWriteRecognize
             pb.Controls.Remove(imagepb);
             uploadedImagePath = "";
             File.Delete("uploaded.png");
-            this.savetm.Interval = 200;
+            this.savetm.Interval = saveInterval;
         }
 
         async private void runPython()

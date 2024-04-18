@@ -1,6 +1,6 @@
 import os
-from tensorflow.keras import models, layers, activations, \
-    optimizers, utils, losses, initializers, metrics, callbacks
+from tensorflow.keras import models, layers, \
+    optimizers, utils, losses, initializers, callbacks
 
 epochs = 500
 batch_size = 32
