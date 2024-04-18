@@ -23,7 +23,7 @@ namespace HandWriteRecognize
         private bool isDrawing = false;
         private bool isErasing = false;
         string outputText = "Output:";
-        private int timeInterval = 500;
+        private int saveInterval = 500;
         private int thickness = 25;
         private Point previousPoint;
         private Point canvaSPoint = new Point(200, 0); // Canva Start Point
