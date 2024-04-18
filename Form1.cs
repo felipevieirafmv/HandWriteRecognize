@@ -23,7 +23,7 @@ namespace HandWriteRecognize
         private bool isDrawing = false;
         private bool isErasing = false;
         string outputText = "Output:";
-        private int thickness = 5;
+        private int thickness = 25;
         private Point previousPoint;
         private Point canvaSPoint = new Point(200, 0); // Canva Start Point
         private Point canvaFPoint = new Point(
@@ -42,8 +42,9 @@ namespace HandWriteRecognize
         }
 
         public void saveBitmap(Bitmap bmp, string path)
-        {
+        {   
             Bitmap croppedBitmap = bmp.Clone(new Rectangle(canvaSPoint.X, canvaSPoint.Y, canvaSize.Width, canvaSize.Height), bmp.PixelFormat);
+            croppedBitmap = new Bitmap(croppedBitmap, canvaSize.Width / 6, canvaSize.Height / 6);
             string filePath = path;
             croppedBitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
         }
@@ -70,7 +71,7 @@ namespace HandWriteRecognize
             this.tm.Interval = 20;
 
             this.savetm = new Timer();
-            this.savetm.Interval = 4000;
+            this.savetm.Interval = 200;
 
             this.BackColor = Color.White;
 
@@ -94,7 +95,10 @@ namespace HandWriteRecognize
                     clearPanel();
 
                 if (e.KeyCode == Keys.E)
+                {
+                    this.thickness = isErasing ? thickness /= 2 : thickness *= 2;
                     isErasing = !isErasing;
+                }
             };
 
             this.MouseWheel += (o, e) =>
@@ -151,12 +155,14 @@ namespace HandWriteRecognize
             string commandsText = "E = Erase\nBackSpace = Clear";
             g.DrawString(commandsText, font, brush, new PointF(10, 30));
 
+            g.DrawString("Interval: " + this.savetm.Interval, font, brush, new PointF(10, 170));
+
             var splitText = uploadedImagePath.Split('\\');
             string file = splitText[splitText.Length - 1];
             int text_length = (int)canvaSPoint.X / 20;
             if (file.Length > text_length)
                 file = file.Substring(0, text_length - 3) + "...";
-            
+
             g.DrawString(file, font, brush, new PointF(110, 75));
 
             g.DrawString(outputText, new Font("Arial", 24), brush, new PointF(canvaSPoint.X, canvaFPoint.Y + 10));
@@ -221,6 +227,7 @@ namespace HandWriteRecognize
             {
                 try
                 {
+                    this.savetm.Interval = 4000;
                     uploadedImagePath = openFileDialog.FileName;
 
                     Bitmap image = new Bitmap(uploadedImagePath);
@@ -244,13 +251,14 @@ namespace HandWriteRecognize
             pb.Controls.Remove(imagepb);
             uploadedImagePath = "";
             File.Delete("uploaded.png");
+            this.savetm.Interval = 200;
         }
 
         async private void runPython()
         {
             HttpClient client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync("http://127.0.0.1:8000/");
-            
+
             if (response.IsSuccessStatusCode)
             {
                 outputText = "Output: " + await response.Content.ReadAsStringAsync();
