@@ -4,7 +4,7 @@ from tensorflow.keras import models
 
 app = Flask(__name__)
 
-model = models.load_model("checkpoints/97-93.keras")
+model = models.load_model("./checkpoints/model.keras")
 
 @app.route('/')
 def predict():
